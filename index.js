@@ -1,7 +1,7 @@
 
 const express = require('express')
 const app = express()
-
+const morgan = require('morgan')
 app.use(express.json())
 
 let persons = [
@@ -26,6 +26,9 @@ let persons = [
         "number": "39-23-6423122"
     }
 ]
+morgan.token('body', req => {return JSON.stringify(req.body)} )
+app.use(morgan('tiny'))
+app.use(morgan(':method  :url :status :res[content-length] - :response-time ms :body'))
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
@@ -43,7 +46,6 @@ app.get('/info', (request, response) => {
 
 app.get('/api/persons/:id', (request, response) => {
     const person = persons.find(person => person.id === request.params.id)
-    console.log(person)
     if (person) response.json(person)
     else response.status(404).end()
 })
@@ -53,7 +55,7 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
-const getId = () =>{
+const getId = () => {
     const id = Math.floor(Math.random() * 100000000)
     return id
 
